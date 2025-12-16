@@ -128,9 +128,9 @@ export default function Game() {
                                 key={politician.id}
                                 politician={politician}
                                 onSwipe={(dir) => handleSwipe(dir, politician)}
-                                style={{ zIndex: cards.length - index, position: 'absolute' }}
+                                style={{ zIndex: index, position: 'absolute' }}
                             />
-                        )).reverse()
+                        ))
                     ) : (
                         <div className="text-center p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl">
                             <h2 className="text-4xl font-black mb-4 bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent">Peli Ohi!</h2>
