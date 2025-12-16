@@ -113,7 +113,7 @@ export default function Game() {
                         PINDER
                     </h1>
                 </div>
-                <div className="bg-white/10 backdrop-blur-md px-6 py-2 rounded-full border border-white/10">
+                <div className="bg-black/40 px-6 py-2 rounded-full border border-white/10">
                     <p className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                         Pisteet: {score}
                     </p>
@@ -123,7 +123,7 @@ export default function Game() {
             <div className="relative w-full max-w-sm h-[32rem] flex items-center justify-center mt-10">
                 <AnimatePresence>
                     {cards.length > 0 ? (
-                        cards.map((politician, index) => (
+                        cards.slice(-3).map((politician, index) => (
                             <Card
                                 key={politician.id}
                                 politician={politician}
