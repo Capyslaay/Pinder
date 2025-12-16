@@ -74,12 +74,12 @@ export default function Game() {
 
             // Artificial loading delay
             setTimeout(() => {
-                setGamePhase('playing');
+                setGamePhase('tutorial');
             }, 1500);
         } else {
             setMusicEnabled(false);
             setIsMuted(true);
-            setGamePhase('playing');
+            setGamePhase('tutorial');
         }
     };
 
@@ -157,6 +157,49 @@ export default function Game() {
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-black z-50 text-white">
                     <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mb-4"></div>
                     <p className="text-xl font-bold animate-pulse">Ladataan biittiä...</p>
+                </div>
+            );
+        }
+
+        if (gamePhase === 'tutorial') {
+            return (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 z-50 p-6 text-center text-white">
+                    <h1 className="text-4xl font-black mb-8 bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent">
+                        KUINKA PELATA
+                    </h1>
+
+                    <div className="space-y-6 max-w-md mb-10 text-lg font-medium">
+                        <div className="flex items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
+                            <span className="text-3xl">⬅️</span>
+                            <div className="text-left">
+                                <span className="block font-bold text-red-400">VASEMMALLE</span>
+                                <span className="text-sm opacity-80">Vasemmistolaiset ehdokkaat</span>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
+                            <span className="text-3xl">➡️</span>
+                            <div className="text-left">
+                                <span className="block font-bold text-green-400">OIKEALLE</span>
+                                <span className="text-sm opacity-80">Oikeistolaiset ehdokkaat</span>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
+                            <span className="text-3xl">⬆️</span>
+                            <div className="text-left">
+                                <span className="block font-bold text-blue-400">YLÖS</span>
+                                <span className="text-sm opacity-80">Keskusta (Super Like)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        onClick={() => setGamePhase('playing')}
+                        className="px-10 py-4 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full text-2xl font-bold hover:scale-105 transition-transform text-white shadow-lg shadow-pink-500/30"
+                    >
+                        ALOITA PELI 🚀
+                    </button>
                 </div>
             );
         }
