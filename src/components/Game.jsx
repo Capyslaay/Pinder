@@ -198,7 +198,7 @@ export default function Game() {
                         onClick={() => setGamePhase('playing')}
                         className="px-10 py-4 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full text-2xl font-bold hover:scale-105 transition-transform text-white shadow-lg shadow-pink-500/30"
                     >
-                        ALOITA PELI 🇫🇮
+                        ALOITA PELI
                     </button>
                 </div>
             );
