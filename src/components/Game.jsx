@@ -17,6 +17,8 @@ export default function Game() {
     const audioRef = useRef(null);
     const [isMuted, setIsMuted] = useState(true); // Default muted until user decides
 
+    const [musicEnabled, setMusicEnabled] = useState(false);
+
     // Initialize Game (Random 20)
     useEffect(() => {
         // Prepare deck but don't start yet
@@ -55,18 +57,27 @@ export default function Game() {
 
     const handleMusicChoice = (wantMusic) => {
         if (wantMusic) {
+            setMusicEnabled(true);
             setGamePhase('loading');
             setIsMuted(false);
 
-            // Artificial loading delay to "fetch" music
+            // CRITICAL: Play immediately to capture user gesture
+            if (audioRef.current) {
+                audioRef.current.volume = 0; // Start silent
+                audioRef.current.play().then(() => {
+                    // Fade in volume after loading
+                    setTimeout(() => {
+                        if (audioRef.current) audioRef.current.volume = 0.3;
+                    }, 1500);
+                }).catch(console.error);
+            }
+
+            // Artificial loading delay
             setTimeout(() => {
-                if (audioRef.current) {
-                    audioRef.current.volume = 0.3;
-                    audioRef.current.play().catch(console.error);
-                }
                 setGamePhase('playing');
             }, 1500);
         } else {
+            setMusicEnabled(false);
             setIsMuted(true);
             setGamePhase('playing');
         }
@@ -144,7 +155,7 @@ export default function Game() {
             <div className="w-full h-full flex flex-col items-center justify-center bg-black text-white">
                 <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mb-4"></div>
                 <p className="text-xl font-bold animate-pulse">Ladataan biittiä...</p>
-                {/* Preload audio */}
+                {/* Keep audio mounted so it keeps playing (silently) */}
                 <audio ref={audioRef} src="/music/ambient.mp3" loop />
             </div>
         );
@@ -155,13 +166,15 @@ export default function Game() {
 
             <audio ref={audioRef} src="/music/ambient.mp3" loop />
 
-            {/* Mute Button */}
-            <button
-                onClick={toggleMute}
-                className="absolute top-4 left-4 z-50 p-2 rounded-full bg-black/40 text-white/50 hover:text-white hover:bg-black/60 transition-all"
-            >
-                {isMuted ? '🔇' : '🔊'}
-            </button>
+            {/* Mute Button - Only show if music was enabled */}
+            {musicEnabled && (
+                <button
+                    onClick={toggleMute}
+                    className="absolute top-4 left-4 z-50 p-2 rounded-full bg-black/40 text-white/50 hover:text-white hover:bg-black/60 transition-all"
+                >
+                    {isMuted ? '🔇' : '🔊'}
+                </button>
+            )}
 
             {/* Demo Indicator */}
             {isDemoMode && (
