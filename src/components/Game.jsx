@@ -173,7 +173,7 @@ export default function Game() {
                             <span className="text-3xl">⬅️</span>
                             <div className="text-left">
                                 <span className="block font-bold text-red-400">VASEMMALLE</span>
-                                <span className="text-sm opacity-80">Vasemmistolaiset ehdokkaat</span>
+                                <span className="text-sm opacity-80">Vasemmistolaiset puolueet</span>
                             </div>
                         </div>
 
@@ -181,7 +181,7 @@ export default function Game() {
                             <span className="text-3xl">➡️</span>
                             <div className="text-left">
                                 <span className="block font-bold text-green-400">OIKEALLE</span>
-                                <span className="text-sm opacity-80">Oikeistolaiset ehdokkaat</span>
+                                <span className="text-sm opacity-80">Oikeistolaiset puolueet</span>
                             </div>
                         </div>
 
@@ -198,7 +198,7 @@ export default function Game() {
                         onClick={() => setGamePhase('playing')}
                         className="px-10 py-4 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full text-2xl font-bold hover:scale-105 transition-transform text-white shadow-lg shadow-pink-500/30"
                     >
-                        ALOITA PELI 🚀
+                        ALOITA PELI 🇫🇮
                     </button>
                 </div>
             );
