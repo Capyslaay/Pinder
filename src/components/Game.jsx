@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Card from './Card';
 import { politicians } from '../data/politicians';
@@ -12,10 +12,32 @@ export default function Game() {
     const [logoClicks, setLogoClicks] = useState(0);
     const [isDemoMode, setIsDemoMode] = useState(false);
 
+    // Audio
+    const audioRef = useRef(null);
+    const [isMuted, setIsMuted] = useState(false);
+
     // Initialize Game (Random 20)
     useEffect(() => {
         startNewGame();
+
+        // Try to play audio on mount (might be blocked by browser)
+        if (audioRef.current) {
+            audioRef.current.volume = 0.3; // Low volume chill
+            audioRef.current.play().catch(e => console.log("Autoplay prevented:", e));
+        }
     }, []);
+
+    const toggleMute = () => {
+        if (audioRef.current) {
+            if (isMuted) {
+                audioRef.current.play();
+                audioRef.current.muted = false;
+            } else {
+                audioRef.current.muted = true;
+            }
+            setIsMuted(!isMuted);
+        }
+    };
 
     const startNewGame = () => {
         // Filter for politicians with images first (simple hack: check if url is not placeholder or specific wikimedia url pattern)
@@ -79,6 +101,16 @@ export default function Game() {
 
     return (
         <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+
+            <audio ref={audioRef} src="/music/ambient.mp3" loop />
+
+            {/* Mute Button */}
+            <button
+                onClick={toggleMute}
+                className="absolute top-4 left-4 z-50 p-2 rounded-full bg-black/40 text-white/50 hover:text-white hover:bg-black/60 transition-all"
+            >
+                {isMuted ? '🔇' : '🔊'}
+            </button>
 
             {/* Demo Indicator */}
             {isDemoMode && (
