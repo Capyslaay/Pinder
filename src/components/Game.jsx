@@ -5,6 +5,7 @@ import { politicians } from '../data/politicians';
 import { demoPoliticians } from '../data/demoData';
 
 export default function Game() {
+    const [gamePhase, setGamePhase] = useState('intro'); // 'intro', 'loading', 'playing'
     const [cards, setCards] = useState([]);
     const [score, setScore] = useState(0);
     const [gameOver, setGameOver] = useState(false);
@@ -14,17 +15,12 @@ export default function Game() {
 
     // Audio
     const audioRef = useRef(null);
-    const [isMuted, setIsMuted] = useState(false);
+    const [isMuted, setIsMuted] = useState(true); // Default muted until user decides
 
     // Initialize Game (Random 20)
     useEffect(() => {
+        // Prepare deck but don't start yet
         startNewGame();
-
-        // Try to play audio on mount (might be blocked by browser)
-        if (audioRef.current) {
-            audioRef.current.volume = 0.3; // Low volume chill
-            audioRef.current.play().catch(e => console.log("Autoplay prevented:", e));
-        }
     }, []);
 
     const toggleMute = () => {
@@ -54,6 +50,26 @@ export default function Game() {
         setGameOver(false);
         setIsDemoMode(false);
         setLogoClicks(0);
+        // Do not set gamePhase here, it's handled by handleMusicChoice or Play Again button
+    };
+
+    const handleMusicChoice = (wantMusic) => {
+        if (wantMusic) {
+            setGamePhase('loading');
+            setIsMuted(false);
+
+            // Artificial loading delay to "fetch" music
+            setTimeout(() => {
+                if (audioRef.current) {
+                    audioRef.current.volume = 0.3;
+                    audioRef.current.play().catch(console.error);
+                }
+                setGamePhase('playing');
+            }, 1500);
+        } else {
+            setIsMuted(true);
+            setGamePhase('playing');
+        }
     };
 
     const activateDemoMode = () => {
@@ -61,6 +77,7 @@ export default function Game() {
         setCards([...demoPoliticians]); // Use the demo stack
         setScore(0);
         setGameOver(false);
+        setGamePhase('playing'); // Ensure demo mode starts playing
     };
 
     const handleLogoClick = () => {
@@ -93,11 +110,45 @@ export default function Game() {
     };
 
     useEffect(() => {
-        if (cards.length === 0 && !isDemoMode) { // Logic slightly redundant but keeps useEffect consistent
-            if (score > 0 || cards.length === 0) setGameOver(true); // Initial load quirk prevent
+        if (gamePhase === 'playing' && cards.length === 0) {
+            setGameOver(true);
         }
-        if (cards.length === 0) setGameOver(true);
-    }, [cards]);
+    }, [cards, gamePhase]);
+
+    if (gamePhase === 'intro') {
+        return (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-black text-white p-4">
+                <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent">
+                    Haluatko musiikin päälle? 🎵
+                </h1>
+                <div className="flex gap-6">
+                    <button
+                        onClick={() => handleMusicChoice(true)}
+                        className="px-8 py-4 bg-green-500 rounded-full text-xl font-bold hover:scale-105 transition-transform"
+                    >
+                        KYLLÄ
+                    </button>
+                    <button
+                        onClick={() => handleMusicChoice(false)}
+                        className="px-8 py-4 bg-gray-700 rounded-full text-xl font-bold hover:scale-105 transition-transform"
+                    >
+                        EI
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    if (gamePhase === 'loading') {
+        return (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-black text-white">
+                <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p className="text-xl font-bold animate-pulse">Ladataan biittiä...</p>
+                {/* Preload audio */}
+                <audio ref={audioRef} src="/music/ambient.mp3" loop />
+            </div>
+        );
+    }
 
     return (
         <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
@@ -154,7 +205,7 @@ export default function Game() {
 
             <div className="relative w-full max-w-sm h-[32rem] flex items-center justify-center mt-10">
                 <AnimatePresence>
-                    {cards.length > 0 ? (
+                    {!gameOver && cards.length > 0 ? (
                         cards.slice(-3).map((politician, index) => (
                             <Card
                                 key={politician.id}
@@ -164,16 +215,21 @@ export default function Game() {
                             />
                         ))
                     ) : (
-                        <div className="text-center p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl">
-                            <h2 className="text-4xl font-black mb-4 bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent">Peli Ohi!</h2>
-                            <p className="text-2xl mb-8 font-medium">Lopulliset Pisteet: {score}</p>
-                            <button
-                                onClick={startNewGame}
-                                className="px-8 py-4 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full font-bold text-xl text-white hover:scale-105 transition-transform shadow-lg hover:shadow-pink-500/50"
-                            >
-                                Pelaa Uudelleen ↺
-                            </button>
-                        </div>
+                        gameOver && (
+                            <div className="text-center p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl relative z-20">
+                                <h2 className="text-4xl font-black mb-4 bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent">Peli Ohi!</h2>
+                                <p className="text-2xl mb-8 font-medium">Lopulliset Pisteet: {score}</p>
+                                <button
+                                    onClick={() => {
+                                        startNewGame();
+                                        setGamePhase('playing'); // Ensure game phase is set to playing after restart
+                                    }}
+                                    className="px-8 py-4 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full font-bold text-xl text-white hover:scale-105 transition-transform shadow-lg hover:shadow-pink-500/50"
+                                >
+                                    Pelaa Uudelleen ↺
+                                </button>
+                            </div>
+                        )
                     )}
                 </AnimatePresence>
             </div>
