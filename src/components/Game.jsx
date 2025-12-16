@@ -126,45 +126,52 @@ export default function Game() {
         }
     }, [cards, gamePhase]);
 
-    if (gamePhase === 'intro') {
-        return (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-black text-white p-4">
-                <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent">
-                    Haluatko musiikin päälle? 🎵
-                </h1>
-                <div className="flex gap-6">
-                    <button
-                        onClick={() => handleMusicChoice(true)}
-                        className="px-8 py-4 bg-green-500 rounded-full text-xl font-bold hover:scale-105 transition-transform"
-                    >
-                        KYLLÄ
-                    </button>
-                    <button
-                        onClick={() => handleMusicChoice(false)}
-                        className="px-8 py-4 bg-gray-700 rounded-full text-xl font-bold hover:scale-105 transition-transform"
-                    >
-                        EI
-                    </button>
+    // Render content based on phase
+    const renderPhase = () => {
+        if (gamePhase === 'intro') {
+            return (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 z-50 p-4">
+                    <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent">
+                        Haluatko musiikin päälle? 🎵
+                    </h1>
+                    <div className="flex gap-6">
+                        <button
+                            onClick={() => handleMusicChoice(true)}
+                            className="px-8 py-4 bg-green-500 rounded-full text-xl font-bold hover:scale-105 transition-transform text-white shadow-lg shadow-green-500/50"
+                        >
+                            KYLLÄ
+                        </button>
+                        <button
+                            onClick={() => handleMusicChoice(false)}
+                            className="px-8 py-4 bg-gray-700 rounded-full text-xl font-bold hover:scale-105 transition-transform text-white"
+                        >
+                            EI
+                        </button>
+                    </div>
                 </div>
-            </div>
-        );
-    }
+            );
+        }
 
-    if (gamePhase === 'loading') {
-        return (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-black text-white">
-                <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                <p className="text-xl font-bold animate-pulse">Ladataan biittiä...</p>
-                {/* Keep audio mounted so it keeps playing (silently) */}
-                <audio ref={audioRef} src="/music/ambient.mp3" loop />
-            </div>
-        );
-    }
+        if (gamePhase === 'loading') {
+            return (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black z-50 text-white">
+                    <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <p className="text-xl font-bold animate-pulse">Ladataan biittiä...</p>
+                </div>
+            );
+        }
+
+        return null;
+    };
 
     return (
         <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
 
+            {/* Audio Element - ALWAYS MOUNTED */}
             <audio ref={audioRef} src="/music/ambient.mp3" loop />
+
+            {/* Phase Overlays */}
+            {renderPhase()}
 
             {/* Mute Button - Only show if music was enabled */}
             {musicEnabled && (
